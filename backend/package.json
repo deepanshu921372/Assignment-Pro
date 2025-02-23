@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js && node seedPricing.js",
-    "start": "node src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "seed": "node seedPricing.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
