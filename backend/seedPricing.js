@@ -11,8 +11,15 @@ const seedPricingData = async () => {
       .then(() => console.log("Connected to MongoDB"))
       .catch((err) => console.error("MongoDB connection error:", err));
 
-    // Create or update pricing data
-    const pricingData = {
+    // Check if pricing data already exists
+    const existingPricing = await Pricing.findOne();
+    if (existingPricing) {
+      console.log("Pricing data already exists. Exiting...");
+      return;
+    }
+
+    // Create initial pricing data
+    const pricingData = new Pricing({
       basic: {
         price: 22,
         description: "Perfect for short assignments",
@@ -35,11 +42,10 @@ const seedPricingData = async () => {
           "Priority support",
         ],
       },
-    };
+    });
 
-    // Use findOneAndUpdate to create or update the pricing data
-    await Pricing.findOneAndUpdate({}, pricingData, { upsert: true, new: true });
-    console.log("Pricing data seeded or updated successfully!");
+    await pricingData.save();
+    console.log("Pricing data seeded successfully!");
   } catch (error) {
     console.error("Error seeding pricing data:", error);
   } finally {
