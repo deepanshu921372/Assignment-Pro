@@ -5,12 +5,21 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import assignmentRoutes from './routes/assignments.js';
 import pricingRoutes from './routes/pricing.js';
+import fs from 'fs';
+import path from 'path';
 dotenv.config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Create uploads directory if it doesn't exist
+const __dirname = path.dirname(new URL(import.meta.url).pathname); // Get the directory name
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
