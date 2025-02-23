@@ -39,7 +39,14 @@ router.post('/', auth, upload.fields([
   { name: 'answerKeyFile', maxCount: 1 }
 ]), async (req, res) => {
   try {
+    console.log('Files received:', req.files); // Log the received files
     const { title, description, price } = req.body;
+
+    // Check if files are present
+    if (!req.files.assignmentFile || !req.files.answerKeyFile) {
+      return res.status(400).json({ message: 'Both assignment file and answer key file are required.' });
+    }
+
     const assignment = new Assignment({
       user: req.user.id,
       title,
