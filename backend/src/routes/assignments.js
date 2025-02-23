@@ -47,6 +47,10 @@ router.post('/', auth, upload.fields([
       return res.status(400).json({ message: 'Both assignment file and answer key file are required.' });
     }
 
+    // Log the paths of the uploaded files
+    console.log('Assignment file path:', req.files.assignmentFile[0].path);
+    console.log('Answer key file path:', req.files.answerKeyFile[0].path);
+
     const assignment = new Assignment({
       user: req.user.id,
       title,
@@ -59,7 +63,7 @@ router.post('/', auth, upload.fields([
     await assignment.save();
     res.status(201).json(assignment);
   } catch (error) {
-    console.error(error);
+    console.error('Error during assignment creation:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
