@@ -115,11 +115,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/pricing', pricingRoutes);
 
-// Log incoming requests
-app.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`);
-    next();
-});
 
 app.get("/", (req, res) => {
   res.send("Server is running...");
