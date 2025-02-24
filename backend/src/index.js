@@ -26,7 +26,7 @@ if (!fs.existsSync(UPLOADS_FOLDER)) {
 }
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://pro-assignment.vercel.app/dashboard'],
+    origin: ['http://localhost:5173', 'https://pro-assignment.vercel.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
