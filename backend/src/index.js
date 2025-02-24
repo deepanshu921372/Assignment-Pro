@@ -11,11 +11,16 @@ dotenv.config();
 
 const app = express();
 
+// Get the directory name in ES modules
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Create uploads directory if it doesn't exist
-const __dirname = path.dirname(new URL(import.meta.url).pathname); // Get the directory name
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);

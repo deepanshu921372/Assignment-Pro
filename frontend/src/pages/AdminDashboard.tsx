@@ -26,12 +26,15 @@ import { useAuth } from '../contexts/AuthContext';
 import API_BASE_URL from '../config';
 import { useToast } from '../contexts/ToastContext';
 import { useTheme } from '../hooks/useTheme';
-
+import JSZip from 'jszip';
+import FileSaver from 'file-saver';
 
 interface Assignment {
   _id: string;
   title: string;
   description: string;
+  assignmentFile: string;
+  answerKeyFile: string;
   status: 'pending' | 'in-progress' | 'completed';
   price: number;
   createdAt: string;
@@ -114,6 +117,26 @@ const AdminDashboard = () => {
     } catch (err: any) {
       // setError('Failed to update assignment status');
       showToast('Failed to update assignment status', 'error');
+    }
+  };
+
+  const handleDownload = async (assignmentId: string, assignmentFile: string, answerKeyFile: string) => {
+    const zip = new JSZip();
+    const folder = zip.folder(`assignment_${assignmentId}`);
+
+    try {
+      const assignmentFileResponse = await axios.get(`${API_BASE_URL}${assignmentFile}`, { responseType: 'blob' });
+      const answerKeyFileResponse = await axios.get(`${API_BASE_URL}${answerKeyFile}`, { responseType: 'blob' });
+
+      if (folder) {
+        folder.file(assignmentFile.split('/').pop()!, assignmentFileResponse.data);
+        folder.file(answerKeyFile.split('/').pop()!, answerKeyFileResponse.data);
+      }
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      FileSaver.saveAs(content, `assignment_${assignmentId}.zip`);
+    } catch (error) {
+      showToast('Failed to download files', 'error');
     }
   };
 
@@ -233,6 +256,7 @@ const AdminDashboard = () => {
               <TableCell>Price (₹)</TableCell>
               <TableCell>Submitted On</TableCell>
               <TableCell>Actions</TableCell>
+              <TableCell>Download</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -301,6 +325,11 @@ const AdminDashboard = () => {
                   <TableCell>
                     <Button onClick={() => handleStatusChange(assignment._id, 'completed')}>Complete</Button>
                     <Button onClick={() => handleStatusChange(assignment._id, 'in-progress')}>In Progress</Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button onClick={() => handleDownload(assignment._id, assignment.assignmentFile, assignment.answerKeyFile)}>
+                      Download
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
