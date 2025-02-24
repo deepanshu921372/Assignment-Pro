@@ -69,7 +69,15 @@ const AdminDashboard = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  
+  useEffect(() => {
+    if (isAuthenticated) {
+      const hasReloaded = sessionStorage.getItem('hasReloaded');
+      if (!hasReloaded) {
+        sessionStorage.setItem('hasReloaded', 'true');
+        window.location.reload();
+      }
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -125,20 +133,23 @@ const AdminDashboard = () => {
     const folder = zip.folder(`assignment_${assignmentId}`);
 
     try {
-      const assignmentFileResponse = await axios.get(`${API_BASE_URL}${assignmentFile}`, { responseType: 'blob' });
-      const answerKeyFileResponse = await axios.get(`${API_BASE_URL}${answerKeyFile}`, { responseType: 'blob' });
+        // Check if the files exist before attempting to download
+        const assignmentFileResponse = await axios.get(`${API_BASE_URL}${assignmentFile}`, { responseType: 'blob' });
+        const answerKeyFileResponse = await axios.get(`${API_BASE_URL}${answerKeyFile}`, { responseType: 'blob' });
 
-      if (folder) {
-        folder.file(assignmentFile.split('/').pop()!, assignmentFileResponse.data);
-        folder.file(answerKeyFile.split('/').pop()!, answerKeyFileResponse.data);
-      }
+        if (folder) {
+            folder.file(assignmentFile.split('/').pop()!, assignmentFileResponse.data);
+            folder.file(answerKeyFile.split('/').pop()!, answerKeyFileResponse.data);
+        }
 
-      const content = await zip.generateAsync({ type: 'blob' });
-      FileSaver.saveAs(content, `assignment_${assignmentId}.zip`);
+        const content = await zip.generateAsync({ type: 'blob' });
+        FileSaver.saveAs(content, `assignment_${assignmentId}.zip`);
+        showToast('Files downloaded successfully', 'success');
     } catch (error) {
-      showToast('Failed to download files', 'error');
+        console.error('Download error:', error); // Log the error for debugging
+        showToast('Failed to download files', 'error');
     }
-  };
+};
 
   if (loading) {
     return (
